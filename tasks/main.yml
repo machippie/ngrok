@@ -1,0 +1,23 @@
+# Standards: 0.1
+---
+- name: Fact ngrok user
+  set_fact:
+    ngrok_user: "{{ ngrok_user | default(homebrew_user) | default(ansible_user_id) }}"
+  tags:
+    - ngrok
+
+- become: "{{ (ngrok_user != ansible_user_id) | bool }}"
+  become_user: "{{ ngrok_user }}"
+  block:
+    - name: Install required package
+      ignore_errors: True
+      homebrew_cask:
+        name: ngrok
+        greedy: True
+        options: appdir=/Applications
+        accept_external_apps: False
+        state: upgraded
+      tags:
+        - ngrok
+
+...
